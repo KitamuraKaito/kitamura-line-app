@@ -1,0 +1,18 @@
+kitamuraAppWebhook:
+  handler: src/domains/WebhookDomain/handler.webhook
+  events:
+  - http:
+      path: /webhook
+      method: POST
+      cors: 
+        origin: '*'
+        headers:
+          - X-Line-Signature
+kitamuraAppGetProf:
+  handler: src/domains/LineProfileDomain/handler.api
+  events:
+  - http:
+      path: /api
+      method: POST
+      cors: 
+        origin: '*'

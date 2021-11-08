@@ -1,0 +1,84 @@
+# Welcome to Serverless!
+#
+# This file is the main config file for your service.
+# It's very minimal at this point and uses default values.
+# You can always add more config options for more control.
+# We've included some commented out config examples here.
+# Just uncomment any of them to get that config option.
+#
+# For full config options, check the docs:
+#    docs.serverless.com
+#
+# Happy Coding!
+service: ${self:custom.defaultProfile}
+
+plugins:
+  - serverless-prune-plugin
+  # - serverless-layers
+  - serverless-pseudo-parameters
+  - serverless-webpack
+  # - serverless-bundle
+
+package:
+  exclude:
+    - .build/**
+    - conf/**
+    - scripts/**
+    - serverless_config/**
+    - serverless.yml
+    - tsconfig.json
+  include:
+    - .serverless/**
+    - webpack.config.js
+  package:
+    individually: true
+  excludeDevDependencies: true
+
+
+provider:
+  name: aws
+  region: ap-northeast-1
+  stage: ${opt:stage, self:custom.defaultStage}
+  profile: ${opt:profile, self:custom.defaultProfile}
+  runtime: nodejs12.x
+  stackName: ${self:custom.defaultProfile}-LambdaStack-${self:provider.stage}
+  timeout: 30
+  logRetentionInDays: 30
+  versionFunctions: false
+  deploymentBucket:
+    name: ${self:custom.defaultLowerProfile}-lambda-stack-deployment-bucket-${self:provider.stage}
+  environment:
+    env: ${self:provider.stage}
+    aws_access_key: ${self:custom.otherfile.secret.${self:provider.stage}.aws_access_key}
+    aws_secret_key: ${self:custom.otherfile.secret.${self:provider.stage}.aws_secret_key}
+    line_token: ${self:custom.otherfile.secret.${self:provider.stage}.line_token}
+  iamRoleStatements:
+    - Effect: Allow
+      Action:
+        - dynamodb:*
+        - s3:*
+        - rekognition:*
+      Resource:
+        - "*"
+custom:
+  defaultStage: dev
+  defaultProfile: kitamura-app
+  defaultLowerProfile: kitamura-app
+  defaultRegion: ap-northeast-1
+  otherfile:
+    environment:
+      dev: ${file(./conf/dev.yml)}
+      # prod: ${file(./conf/prod.yml)}
+    secret: 
+      dev: ${file(./conf/secret/.dev.yml)}
+      # prod: ${file(./conf/secret/.prod.yml)}
+  serverless-offline: ${file(./serverless_config/plugin/serverless-offline.yml)}
+  prune: ${file(./serverless_config/plugin/prune.yml)}
+  webpack:
+    includeModules: true
+
+
+functions:
+  - ${file(./serverless_config/functions/function.yml)}
+resources:
+  - ${file(./serverless_config/db/dynamodb.yml)}
