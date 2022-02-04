@@ -14,10 +14,8 @@ service: ${self:custom.defaultProfile}
 
 plugins:
   - serverless-prune-plugin
-  # - serverless-layers
   - serverless-pseudo-parameters
   - serverless-webpack
-  # - serverless-bundle
 
 package:
   exclude:
@@ -30,8 +28,7 @@ package:
   include:
     - .serverless/**
     - webpack.config.js
-  package:
-    individually: true
+  individually: true
   excludeDevDependencies: true
 
 
@@ -62,20 +59,26 @@ provider:
         - "*"
 custom:
   defaultStage: dev
-  defaultProfile: kitamura-app
-  defaultLowerProfile: kitamura-app
+  defaultProfile: kaoapp-kitamura
+  defaultLowerProfile: kaoapp-kitamura
   defaultRegion: ap-northeast-1
   otherfile:
     environment:
       dev: ${file(./conf/dev.yml)}
+      # stg: ${file(./conf/stg.yml)}
       # prod: ${file(./conf/prod.yml)}
     secret: 
       dev: ${file(./conf/secret/.dev.yml)}
+      # stg: ${file(./conf/secret/.stg.yml)}
       # prod: ${file(./conf/secret/.prod.yml)}
   serverless-offline: ${file(./serverless_config/plugin/serverless-offline.yml)}
   prune: ${file(./serverless_config/plugin/prune.yml)}
   webpack:
     includeModules: true
+    packagerOptions:
+      scripts:
+        - rm -rf node_modules/sharp
+        - npm install --production --arch=x64 --platform=linux sharp
 
 
 functions:

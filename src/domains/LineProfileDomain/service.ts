@@ -8,9 +8,6 @@ import { LineProfileUtils } from '../../utils/lineProfile/lineProfile';
  * LineService
  */
 export class LineProfileSercvice {
-    /**
-     * 
-     */
     @apigateway()
     static async getProfile(event) {
         console.log(event)
